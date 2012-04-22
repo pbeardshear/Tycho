@@ -1,7 +1,7 @@
-var _ = require('underscore');
+var _ = require('underscore'),
+	Class = require('./class');
 
 require('./mixins');
-require('./eventable');
 
 // -------------------------------------------------------------------------------
 // Game world - represents a single instance of a game running on a server
@@ -9,23 +9,25 @@ require('./eventable');
 //				manage multiple instances to handle player load
 // -------------------------------------------------------------------------------
 
-World = function (id, maxPlayers) {
-	// Mixins
-	this.mixin(['eventable']);
+World = Class.extend({
+	mixins: ['eventable'],
 	
-	// Constructor
-	this.id = id;
-	this.maxPlayers = maxPlayers;
-	this.numPlayers = 0;
+	players = {},
+	entities = {},
 	
-	this.players = { };
-	this.entities = { };
-	
-};
+	init: function (id, maxPlayers) {
+		this.id = id;
+		this.maxPlayers = maxPlayers;
+		this.numPlayers = 0,
+		
+		this.players = {};
+		this.entities = {};
+	}
+});
 
 // Methods
-World.prototype = {
+World.prototype = ({
 	
-};
+}).mixin(['eventable']);
 
 module.exports = World;

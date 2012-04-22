@@ -27,10 +27,29 @@ Utils.randomInt = function (min, max) {
 };
 
 Utils.format = function (base) {
-	var args = Array.prototype.slice(arguments, 1),
+	var args = Array.prototype.slice.call(arguments, 1),
 		token = null;
+	console.log('utils.format', args);
 	while (token = base.match(/{(\d)}/)) {
-		base.replace(token[0], args[parseInt(token[1])]);
+		base = base.replace(token[0], args[parseInt(token[1])]);
 	}
 	return base;
+};
+
+// Removes the element at start index and places it at end index
+Utils.move = function (array, start, end) {
+	var el = array.splice(start, 1)[0];
+	if (el) {
+		array.splice(end, 0, el);
+	}
 }
+
+Utils.moveBack = function (arr, start) {
+	Utils.move(arr, start, arr.length - 1);
+};
+
+Utils.moveFront = function (arr, start) {
+	Utils.move(arr, start, 0);
+};
+
+
