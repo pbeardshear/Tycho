@@ -11,7 +11,7 @@ registerMixin = function (name, properties) {
 	_mixins[name] = properties;
 };
 
-addMixins = mixin = function (target, mixins) {
+module.exports = mixin = function (target, mixins) {
 	if (Array.isArray(mixins)) {
 		var properties;
 		_.each(mixins, function (name) {
@@ -32,10 +32,6 @@ addMixins = mixin = function (target, mixins) {
 		mixin(target, [mixins]);
 	}
 	return target;
-};
-
-Object.prototype.mixin = function (mixins) {
-	return mixin(this, mixins);
 };
 
 

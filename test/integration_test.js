@@ -23,6 +23,7 @@ exports.server = {
 		
 		// Get the second instance
 		var instance = this.server._instanceLRU[0];
+		console.log(this.server.handConnection)
 		this.server.handConnection(new Connection({ id: 1 }));
 		// Check if this instance has moved to the back
 		test.equal(this.server._instanceLRU[1], instance);

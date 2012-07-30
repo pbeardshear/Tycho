@@ -11,23 +11,18 @@
  *	game world, when players are distributed to balance load
  *
  */
-var _ = require('underscore'),
-	spine = require('./spine'),
-	Class = require('./class'),
-	Server = require('./server'),
-	Connection = require('./connection');
  
 Instance =  Class.extend({
 	_connections: {},
 	// Represents an instance of the application specific internal type which connection will wrap
 	_internal: null,
 	
-	init: function (server) {
+	init: function (server, name) {
 		// Create an instance of the internal type
-		this._internal = new spine.instanceType();
+		this._internal = new spine.instanceType(server, name);
 		this._internal.broadcast = this.broadcast;
 		this._internal.send = this.send;
-		this._hasRouting = !!this._internal.Messages;
+		this._hasRouting = !!this._internal.Routes;
 		
 		// Hook into the event handlers that the instance class exposes
 		this.onConnect = (this._internal.onConnect || this._onConnect).bind(this._internal);
@@ -63,7 +58,7 @@ Instance =  Class.extend({
 	dropConnection: function (connection) {
 		delete this._connections[connection.id];
 		// Bubble this event up to the server
-		this._server.dropConnection(connection);
+		this._server.dropConnection(this, connection);
 	},
 	
 	// Empty handlers if the user did not provide event hooks for the instance
@@ -71,7 +66,12 @@ Instance =  Class.extend({
 	_onDisconnect: function () { },
 	_onMessage: function (connection, message) {
 		if (this._hasRouting) {
-			this._internal.Messages[message.type].call(this._internal, connection._internal, message);
+			if (this._internal.Routes[message.type]) {
+				this._internal.Routes[message.type].call(this._internal, connection._internal, message);
+			}
+			else if (spine.Routes[message.type]) {
+				spine.Routes[message.type].call(this, this._internal, connection._internal, message);
+			}
 		}
 	}
 });

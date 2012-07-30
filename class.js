@@ -1,7 +1,7 @@
 //
 //	Simple Javascript class creation helper
 //
-require('./mixins');
+var mixin = require('./mixins');
 
 module.exports = Class = {
 	extend: function (prop) {
@@ -9,10 +9,13 @@ module.exports = Class = {
 		delete prop.init;
 		_constructor.prototype = prop;
 		if (prop.mixins) {
-			_constructor.prototype.mixin(prop.mixins);
+			Class.mixin(_constructor.prototype, prop.mixins);
 		}
 		return _constructor;
 	},
-	implement: function () { }
+	
+	implement: function () { },
+	
+	mixin: mixin
 };
 

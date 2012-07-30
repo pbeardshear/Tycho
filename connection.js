@@ -12,12 +12,6 @@
  *	One of the three main components of spine.js, in addition to server.js and instance.js
  *
  */
- 
-var _ = require('underscore'),
-	spine = require('./spine'),
-	Server = require('./server'),
-	Instance = require('./instance'),
-	Class = require('./Class');
 
 Connection = Class.extend({
 	// Maintain a reference to the internal websocket
@@ -35,21 +29,33 @@ Connection = Class.extend({
 		
 		// Initialize connection
 		this.id = websocket.id;
-		this._hasRouting = !!this._internal.Messages;
+		this._hasRouting = !!(this._internal && this._internal.Routes);
 		
 		// Initialize handlers that the internal class provides
 		this.onDisconnect = (this._internal.onDisconnect || this._onDisconnect).bind(this);
 		this.onMessage = (this._internal.onMessage || this._onMessage).bind(this);
 		
+		spine.out.log('creating connection');
+		spine.out.log(this);
 		this._socket = websocket;
 	},
 	
-	send: function (message) {
-		var tempNamespace = {};
-		message.init.call(tempNamespace);
-		// Validate the submission
-		if (!message.validate || message.validate.call(tempNamespace)) {
-			this._socket.emit('message', message.serialize.call(tempNamespace), message.callback || null);
+	send: function (message, name) {
+		spine.out.log('sending message');
+		spine.out.log(this);
+		spine.out.log(this._onDisconnect);
+		spine.out.log(this._socket);
+		if (typeof message === 'string') {
+			// Send a simple string message
+			this._socket.emit('message', { type: name, data: message });
+		}
+		else {
+			var tempNamespace = {};
+			message.init.call(tempNamespace);
+			// Validate the submission
+			if (!message.validate || message.validate.call(tempNamespace)) {
+				this._socket.emit('message', message.serialize.call(tempNamespace), message.callback || null);
+			}
 		}
 	},
 	
@@ -59,7 +65,7 @@ Connection = Class.extend({
 	// Otherwise, events are passed through to the instance.
 	_onDisconnect: function () {
 		if (this._hasRouting) {
-			this._internal.Messages.disconnect.call(this._internal);
+			this._internal.Routes.disconnect.call(this._internal);
 		}
 		else {
 			this.instance.onDisconnect(this);
@@ -69,11 +75,28 @@ Connection = Class.extend({
 	},
 	
 	_onMessage: function (message) {
-		if (!spine.routeToInstance && this._hasRouting) {
-			this._internal.Messages[message.type].call(this._internal, message);
+		spine.out.log('received message' + message);
+		
+		if (spine.routeToInstance) {
+			this.instance.onMessage(this, message);
 		}
 		else {
-			this.instance.onMessage(this, message);
+			if (this._hasRouting) {
+				if (this._internal.Routes[message.type]) {
+					this._internal.Routes[message.type].call(this._internal, message);
+				}
+				// If the internal connection doesn't have the message, look for defaults
+				else if (spine.Routes[message.type]) {
+					spine.Routes[message.type].call(this, this._internal, message);
+				}
+			}
+			else {
+				// TODO: This should probably be on Server, not spine
+				// Route directly to the server
+				spine.out.log(this);
+				spine.out.log(this._socket);
+				spine.Routes[message.type].call(this, this._internal, message);
+			}
 		}
 	}
 	

@@ -9,38 +9,60 @@
  *	while spine takes care of routing and server management.
  *
  */
-var Server = require('./server'),
+var _ = require('underscore'),
+	Class = require('./class'),
+	utils = require('./utils'),
+	Server = require('./server'),
 	Instance = require('./instance'),
 	Connection = require('./connection'),
 	Messages = require('./message');
- 
+
 spine = (function () {
-	var _maxConnections,
-		_message,
-		_internalInstance,
-		_internalConnection;
+	// @Private namespace
+	var _self = {
+		maxConnections: 1000,
+		directRouting: false,
+		autoGenerate: true
+	};
 	
 	return {
-		// Config options
-		instanceType: function () {
-			return _internalInstance;
-		},
-		connectionType: function () {
-			return _internalConnection;
+		// Namespace for outputting debug info to the console
+		out: {
+			log: function (msg) {
+				console.log('\u001b[0;32m   info ::', msg, '\u001b[0;37m');
+			},
+			warn: function (msg) {
+				console.log('\u001b[1;33m   warning ::', msg, '\u001b[0;37m');
+			},
+			error: function (msg) {
+				console.log('\u001b[1;31m   ERROR ::', msg, '\u001b[0;37m');
+			}
 		},
 		
-		routeToInstance: function () {
-			return _directRouting;
-		},
+		// Config options
+		instanceType: null,
+		
+		connectionType: null,
+		
+		routeToInstance: false,
+		
+		useNames: false,
 		
 		// Set the state variables to their default values
 		loadDefaults: function () {
-			_maxConnections = 1000;
-			_message = Messages;
-			_directRouting = false;
-			_internalInstance = null;
-			_internalConnection = null;
+			this.instanceType = function () { };
+			this.connectionType = function () { };
+			this.routeToInstance = false;
+			this.Messages = require('./message');
 		},
+		
+		initializeRoutes: function () {
+			// Create the default routes for server-based functionality
+			this.Routes = {
+				create: this._createInstance
+			};
+		},
+		
 		/*
 		 *	The meat of spine.js
 		 *	Creates a new server, based on a passed configuration object
@@ -53,32 +75,57 @@ spine = (function () {
 		 */
 		createServer: function (config) {
 			if (config) {
-				_maxConnections = config.maxConnections || 1000;
-				_message = config.accept || Messages;
-				_directRouting = config.routeToInstance || false;
+				// Set configuration values
+				_self.maxConnections = config.maxConnections || 1000;
+				_self.directRouting = config.routeToInstance || false;
+				_self.autoGenerate = config.autoGenerate || true;
+				
+				// Set references to user-defined code
+				this.routeToInstance = config.routeToInstance || false;
+				this.useNames = config.autoName || false;
+				this.instanceType = config.instanceType || function () { };
+				this.connectionType = config.connectionType || function () { };
+				this.Messages = config.accept || (require('./message'));
+				// Warnings about config parameters, just in case someone forgot or mistyped
 				if (!config.instanceType) {
-					console.warn('Not using a wrapper type for instances.');
+					this.out.warn('Not using a wrapper type for instances.');
 				}
-				_internalInstance = config.instanceType || null;
 				if (!config.connectionType) {
-					console.warn('Not using a wrapper type for connections.');
+					this.out.warn('Not using a wrapper type for connections.');
 				}
-				_internalConnection = config.connectionType || null;
+				if (this.useNames && _self.autoGenerate) {
+					_self.autoGenerate = false;
+					this.out.warn('Unable to auto-generate instances if instances are referenced by name.');
+				}
+				// TODO: What was this for?
+				// if (!_autocreateInstances) {
+					// this._createInstance = this.createInstance;
+				// }
 			}
 			else {
 				// User didn't initialize the server with a configuration object, so just use the defaults
-				console.warn('Creating spine server with default configuration.');
+				this.out.warn('Creating spine server with default configuration.');
 				this.loadDefaults();
 			}
 			
+			// Initialize default routes
+			this.initializeRoutes();
+			
 			// Create the server object
-			this.server = new Server();
+			this.server = new Server(this.useNames, _self.autoGenerate);
+			// Allow method chaining
+			return this;
 		},
 		
 		listen: function (port) {
 			this.server.listen(port);
+			return this;
 		}
 	};
 })();
+
+process.on('uncaughtException', function (exception) {
+	spine.out.error(exception.stack);
+});
 
 module.exports = spine;
