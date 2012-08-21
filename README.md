@@ -63,5 +63,4 @@ to provide consistency in message definitions.  All client-side code is purely o
 
 ## Documentation
 
-Full documentation can be found at: [coming soon]
-
+Full documentation can be found at: http://pbeardshear.github.com/Tycho
