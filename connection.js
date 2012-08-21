@@ -5,11 +5,11 @@
 /*
  *
  *	Represents a socket.io connection to the client.
- *	In spine.js, connections are usually encapsulated by a user class,
+ *	In tycho.js, connections are usually encapsulated by a user class,
  *	(e.g. a Player, a User, etc.), which provides abstracted methods for
  *	the application to take advantage of.
  *
- *	One of the three main components of spine.js, in addition to server.js and instance.js
+ *	One of the three main components of tycho.js, in addition to server.js and instance.js
  *
  */
 
@@ -23,7 +23,7 @@ Connection = Class.extend({
 	instance: null,
 	
 	init: function (websocket) {
-		this._internal = new spine.connectionType();
+		this._internal = new tycho.connectionType();
 		// Add hooks into the internal object that give access to connection methods
 		this._internal.send = this.send;
 		
@@ -35,16 +35,29 @@ Connection = Class.extend({
 		this.onDisconnect = (this._internal.onDisconnect || this._onDisconnect).bind(this);
 		this.onMessage = (this._internal.onMessage || this._onMessage).bind(this);
 		
-		spine.out.log('creating connection');
-		spine.out.log(this);
+		tycho.out.log('creating connection');
+		tycho.out.log(this);
 		this._socket = websocket;
+		tycho.fireEvent('connection', 'create', this);
+	},
+	
+	end: function () {
+		// Send a closing message down to the client
+		// TODO: Determine the best way to send a close message out to the client
+		// We should probably establish some base message types that will be used
+		// by default by tycho
+		// this.send({ }, 'close');
+		tycho.fireEvent('connection', 'close', this);
+		// Invalidate this connection
+		this.id = null;
+		this._socket = null;
 	},
 	
 	send: function (message, name) {
-		spine.out.log('sending message');
-		spine.out.log(this);
-		spine.out.log(this._onDisconnect);
-		spine.out.log(this._socket);
+		tycho.out.log('sending message');
+		tycho.out.log(this);
+		tycho.out.log(this._onDisconnect);
+		tycho.out.log(this._socket);
 		if (typeof message === 'string') {
 			// Send a simple string message
 			this._socket.emit('message', { type: name, data: message });
@@ -64,6 +77,7 @@ Connection = Class.extend({
 	// then we check if it implements a routing namespace.
 	// Otherwise, events are passed through to the instance.
 	_onDisconnect: function () {
+		tycho.fireEvent('connection', 'disconnect', this);
 		if (this._hasRouting) {
 			this._internal.Routes.disconnect.call(this._internal);
 		}
@@ -75,9 +89,10 @@ Connection = Class.extend({
 	},
 	
 	_onMessage: function (message) {
-		spine.out.log('received message' + message);
+		tycho.fireEvent('connection', 'message', this, [message]);
+		tycho.out.log('received message' + message);
 		
-		if (spine.routeToInstance) {
+		if (tycho.routeToInstance) {
 			this.instance.onMessage(this, message);
 		}
 		else {
@@ -86,16 +101,16 @@ Connection = Class.extend({
 					this._internal.Routes[message.type].call(this._internal, message);
 				}
 				// If the internal connection doesn't have the message, look for defaults
-				else if (spine.Routes[message.type]) {
-					spine.Routes[message.type].call(this, this._internal, message);
+				else if (tycho.Routes[message.type]) {
+					tycho.Routes[message.type].call(this, this._internal, message);
 				}
 			}
 			else {
-				// TODO: This should probably be on Server, not spine
+				// TODO: This should probably be on Server, not tycho
 				// Route directly to the server
-				spine.out.log(this);
-				spine.out.log(this._socket);
-				spine.Routes[message.type].call(this, this._internal, message);
+				tycho.out.log(this);
+				tycho.out.log(this._socket);
+				tycho.Routes[message.type].call(this, this._internal, message);
 			}
 		}
 	}

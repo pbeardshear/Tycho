@@ -1,28 +1,28 @@
 //
-//	spine-client.js
+//	tycho-client.js
 //
 
 /*
  *
- *	spine.js companion client library for simplifying connections to 
- *	a spine.js backend
+ *	tycho.js companion client library for simplifying connections to 
+ *	a tycho.js backend
  *	
- *	spine-client is completely optional, and not required if you 
- *	just want to use the server-side spine.js
+ *	tycho-client is completely optional, and not required if you 
+ *	just want to use the server-side tycho.js
  */
 
-spine = (function () {
+tycho = (function () {
 	
 	return {
 		init: function (port) {
 			var self = this;
-			// Connect to the running spine server
+			// Connect to the running tycho server
 			// socket.io is required here
 			if (io) {
 				// TODO: Make this generic
 				this._socket = io.connect('http://localhost:3000/');
 				
-				// spine.js send all messages through the 'message' header
+				// tycho.js send all messages through the 'message' header
 				// Each message is identified by its type property
 				this._socket.on('message', function (message) {
 					// Message handler
@@ -33,7 +33,7 @@ spine = (function () {
 				});
 			}
 			else {
-				console.error('Could not find socket.io.  Please load the socket.io module before spine-client.');
+				console.error('Could not find socket.io.  Please load the socket.io module before tycho-client.');
 			}
 		},
 		

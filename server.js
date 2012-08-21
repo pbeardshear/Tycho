@@ -4,8 +4,8 @@
 
 /*
  *
- *	The server component of spine.js.
- * 	One of the three main components of spine.js, in addition to instance.js and connection.js
+ *	The server component of tycho.js.
+ * 	One of the three main components of tycho.js, in addition to instance.js and connection.js
  *
  */
  
@@ -33,19 +33,33 @@ Server = Class.extend({
 		});
 		
 		// TODO: Register sockets on a namespace using .of(namespace)
-		spine.out.log('start io');
 		io.listen(this._httpServer).sockets.on('connection', this.registerConnection.bind(this));
-		spine.out.log('end io');
 		
 		// Set up config values
 		// TODO: Consider whether to allow namedInstances + autogenerate
 		this._namedInstances = namedInstances;
 		this._autocreateInstances = autocreateInstances;
+		
+		tycho.fireEvent('server', 'start', this);
 	},
 	
 	listen: function (port) {
 		this._port = port;
 		this._httpServer.listen(port);
+	},
+	
+	close: function () {
+		this._httpServer.close();
+		tycho.fireEvent('server', 'close', this);
+	},
+	
+	end: function () {
+		// Broadcast the close event to the instances on this server
+		var instances = this._namedInstances ? this._instances : this._instanceLRU;
+		_.each(instances, function (inst) {
+			inst.end();
+		});
+		this.close();
 	},
 	
 	// Alert the server to initialize a new instance
@@ -59,6 +73,7 @@ Server = Class.extend({
 			// We aren't using named instances, so instead we use the LRU array to manage the instances
 			this._instanceLRU.unshift(inst);
 		}
+		tycho.fireEvent('server', 'instance', this, inst);
 		return inst;
 	},
 	
@@ -66,12 +81,12 @@ Server = Class.extend({
 	// When it is registered with the server,
 	// and when it is handed to an instance to manage
 	registerConnection: function (socket) {
-		spine.out.log('register connection');
+		tycho.out.log('register connection');
 		var connection = new Connection(socket);
 		this._connections[socket.id] = connection;
 		// Client sends a message
-		spine.out.log(connection.onMessage);
-		spine.out.log(connection.onDisconnect);
+		tycho.out.log(connection.onMessage);
+		tycho.out.log(connection.onDisconnect);
 		socket.on('message', connection.onMessage.bind(connection));
 		// Client disconnects
 		socket.on('disconnect', connection.onDisconnect.bind(connection));
@@ -84,8 +99,10 @@ Server = Class.extend({
 			}
 			// TODO: Implement load balancing
 		}
+		tycho.fireEvent('server', 'connection', this, connection);
+		// TODO: This shouldn't always happen once the server gets a connection, right?
 		this.handConnection(connection, utils.guid());
-		spine.out.log('end register connection');
+		tycho.out.log('end register connection');
 	},
 	
 	// Pass a connection off to an instance

@@ -1,12 +1,12 @@
 //
-//	spine.js
+//	tycho.js
 //
 
 /*
  *
  *	Server framework for setting up real-time multiplayer games
  *	using node.js.  Users only write application specific code,
- *	while spine takes care of routing and server management.
+ *	while tycho takes care of routing and server management.
  *
  */
 var _ = require('underscore'),
@@ -17,12 +17,17 @@ var _ = require('underscore'),
 	Connection = require('./connection'),
 	Messages = require('./message');
 
-spine = (function () {
+tycho = (function () {
 	// @Private namespace
 	var _self = {
 		maxConnections: 1000,
 		directRouting: false,
-		autoGenerate: true
+		autoGenerate: true,
+		events: {
+			connection: { },
+			instance: { },
+			server: { }
+		}
 	};
 	
 	return {
@@ -64,13 +69,13 @@ spine = (function () {
 		},
 		
 		/*
-		 *	The meat of spine.js
+		 *	The meat of tycho.js
 		 *	Creates a new server, based on a passed configuration object
 		 *	Config options:
 		 *		maxConnections {int} - maximum number of live connections [default: 1000]
-		 *		accept {object} - the message object to use for client communication [default: spine.Message]
-		 *		instanceType {object} - the instance type to use internally by spine.Instance [default: none]
-		 *		connectionType {object} - the connection type to use internally by spine.Connection [default: none]
+		 *		accept {object} - the message object to use for client communication [default: tycho.Message]
+		 *		instanceType {object} - the instance type to use internally by tycho.Instance [default: none]
+		 *		connectionType {object} - the connection type to use internally by tycho.Connection [default: none]
 		 *		routeToInstance {boolean} - indicates whether messages from the client should be routed directly to the instance [default: false]
 		 */
 		createServer: function (config) {
@@ -97,6 +102,14 @@ spine = (function () {
 					_self.autoGenerate = false;
 					this.out.warn('Unable to auto-generate instances if instances are referenced by name.');
 				}
+				
+				if (config.modules) {
+					// Load in custom modules
+					// TODO: Modules will need access to server, instances, and connections,
+					// how do we provide an interface for that here?
+					// Subscribe/publish pattern, for modules to ask for events (new connection,
+					// new instance, connection message, etc.) that tycho can then provide?
+				}
 				// TODO: What was this for?
 				// if (!_autocreateInstances) {
 					// this._createInstance = this.createInstance;
@@ -104,12 +117,23 @@ spine = (function () {
 			}
 			else {
 				// User didn't initialize the server with a configuration object, so just use the defaults
-				this.out.warn('Creating spine server with default configuration.');
+				this.out.warn('Creating tycho server with default configuration.');
 				this.loadDefaults();
 			}
 			
 			// Initialize default routes
 			this.initializeRoutes();
+										
+			// Publish events for modules to listen on
+			this.publish('connection', 'create');
+			this.publish('connection', 'message');
+			this.publish('connection', 'disconnect');
+			this.publish('instance', 'create');
+			this.publish('instance', 'connection');
+			this.publish('instance', 'disconnect');
+			this.publish('server', 'start');
+			this.publish('server', 'instance');
+			this.publish('server', 'connection');
 			
 			// Create the server object
 			this.server = new Server(this.useNames, _self.autoGenerate);
@@ -120,12 +144,67 @@ spine = (function () {
 		listen: function (port) {
 			this.server.listen(port);
 			return this;
+		},
+		
+		close: function () {
+			this.server.close();
+		},
+		
+		// Close down all connections, instances, and servers in this tycho instance
+		// Revert to an initial state
+		end: function () {
+			this.server.end();
+			this.dropEvents();
+			// Reset properties to defaults
+			this.loadDefaults();
+			this.initializeRoutes();
+		},
+		
+		// Publish and subscribe pattern for modules to bind to server events
+		dropEvents: function () {
+			// Reset the events object
+			_self.events = {
+				connection: { },
+				instance: { },
+				server: { }
+			};
+		},
+		
+		publish: function (target, eventName) {
+			var events = _self.events[target];
+			if (events) {
+				// Valid target
+				if (!events[eventName]) {
+					events[eventName] = [];
+				}
+			}
+		},
+		
+		subscribe: function (target, eventName, fn) {
+			var events = _self.events[target];
+			if (events && events[eventName]) {
+				events[eventName].push(fn);
+			}
+			else {
+				this.out.warn('Cannot subscribe to event ' + eventName + ' on target ' + target);
+			}
+		},
+		
+		fireEvent: function (target, eventName, scope, args) {
+			var events = _self.events[target];
+			if (events && events[eventName]) {
+				for (var i = 0; i < events[eventName].length; i++) {
+					if (typeof events[eventName][i] === 'function') {
+						events[eventName][i].apply(scope, args || []);
+					}
+				}
+			}
 		}
 	};
 })();
 
 process.on('uncaughtException', function (exception) {
-	spine.out.error(exception.stack);
+	tycho.out.error(exception.stack);
 });
 
-module.exports = spine;
+module.exports = tycho;

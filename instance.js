@@ -19,7 +19,7 @@ Instance =  Class.extend({
 	
 	init: function (server, name) {
 		// Create an instance of the internal type
-		this._internal = new spine.instanceType(server, name);
+		this._internal = new tycho.instanceType(server, name);
 		this._internal.broadcast = this.broadcast;
 		this._internal.send = this.send;
 		this._hasRouting = !!this._internal.Routes;
@@ -31,6 +31,16 @@ Instance =  Class.extend({
 		
 		// Initialize the connection
 		this._server = server;
+		
+		tycho.fireEvent('instance', 'create', this);
+	},
+	
+	end: function () {
+		// Broadcast the end to all connections on this instance
+		_.each(this._connections, function (conn) {
+			conn.end();
+		});
+		this.fireEvent('instance', 'end', this);
 	},
 	
 	// Broadcast a message to all connections in this instance
@@ -53,12 +63,14 @@ Instance =  Class.extend({
 	handConnection: function (connection) {
 		this._connections[connection.id] = connection;
 		connection.instance = this;
+		tycho.fireEvent('instance', 'connection', this, [connection]);
 	},
 	
 	dropConnection: function (connection) {
 		delete this._connections[connection.id];
 		// Bubble this event up to the server
 		this._server.dropConnection(this, connection);
+		tycho.fireEvent('instance', 'disconnect', this, [connection]);
 	},
 	
 	// Empty handlers if the user did not provide event hooks for the instance
@@ -69,8 +81,8 @@ Instance =  Class.extend({
 			if (this._internal.Routes[message.type]) {
 				this._internal.Routes[message.type].call(this._internal, connection._internal, message);
 			}
-			else if (spine.Routes[message.type]) {
-				spine.Routes[message.type].call(this, this._internal, connection._internal, message);
+			else if (tycho.Routes[message.type]) {
+				tycho.Routes[message.type].call(this, this._internal, connection._internal, message);
 			}
 		}
 	}

@@ -4,16 +4,16 @@
 
 /*
  *
- *	Client message handling for spine.js
+ *	Client message handling for tycho.js
  *
  */
 
-// namespace(spine) imported from spine-client.js
-// If you are not using the spine client library, then Messages will
+// namespace(tycho) imported from tycho-client.js
+// If you are not using the tycho client library, then Messages will
 // be bound to the global namespace
 //
-// TODO: Remove all dependencies on spine-client
-(this.spine || this).Messages = (function () {
+// TODO: Remove all dependencies on tycho-client
+(this.tycho || this).Messages = (function () {
 	var _events = {},
 		_receivers = {},
 		_registeredNamespace = null;
@@ -34,7 +34,7 @@
 				this.init.call(_tempNamespace);
 			}
 			if (!this.validate || this.validate.call(_tempNamespace)) {
-				spine._socket.emit('message', 
+				tycho._socket.emit('message', 
 					{ type: this.name, data: this.serialize.call(_tempNamespace) },
 					this.handleResponse.bind(this, callback, _tempNamespace));
 			}
@@ -77,10 +77,10 @@
 		create: function (name, config) {
 			// Check for required fields
 			if (!name) {
-				throw new Error("Unable to create new spine.Message: name not provided.");
+				throw new Error("Unable to create new tycho.Message: name not provided.");
 			}
 			if (!config.serialize) {
-				throw new Error("Unable to create new spine.Message: missing required field (serialize).");
+				throw new Error("Unable to create new tycho.Message: missing required field (serialize).");
 			}
 			
 			// Initialize the message
@@ -91,14 +91,14 @@
 		// Register a message namespace for sending message, which allows you to add or remove different message types.
 		register: function (namespace) {
 			// Iterate over the namespace,  and add each message in turn
-			spine.util.forEach(namespace, function (config, name) {
+			tycho.util.forEach(namespace, function (config, name) {
 				this.create(name, config);
 			}, this);
 		},
 		
-		// Tell spine what message types you will accept from the server
+		// Tell tycho what message types you will accept from the server
 		acceptMessages: function (messages) {
-			spine.util.forEach(messages, function (callback, name) {
+			tycho.util.forEach(messages, function (callback, name) {
 				// TODO: May want to wrap additional structure around callback,
 				// or provide additional functionality to hook into if useful
 				_receivers[name] = callback;
