@@ -21,7 +21,7 @@ of users (e.g. board game, lobby-based game).  Tycho is written is such a way as
 
 ## How to use
 
-```js tycho.createServer ``` is the main entry point for the Tycho framework, and is likely one of only a handful of places where you would need to reference tycho directly.
+```tycho.createServer``` is the main entry point for the Tycho framework, and is likely one of only a handful of places where you would need to reference tycho directly.
 Hooking your game logic into tycho is as simple as passing a few configuration parameters:
 
 ```js
@@ -32,7 +32,7 @@ tycho.createServer({
 });
 ```
 
-In this example, ```js Game``` and ```js User``` would be constructors of the user-defined classes that wrap the two tycho constructs.  Whenever tycho creates a new connection
+In this example, ```Game``` and ```User``` would be constructors of the user-defined classes that wrap the two tycho constructs.  Whenever tycho creates a new connection
 (i.e. a new user connects), for example, an instance of the User class would also be created and automatically hooked into the tycho connection.  Any message or data from the client
 is automatically routed to the User instance by tycho.
 
