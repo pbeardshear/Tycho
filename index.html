@@ -44,20 +44,18 @@
 		To get started using Tycho:
 		</p>
 
-		<pre><code>
-		var tycho = require('tycho'),
-			server = tycho.createServer();
-			
-		server.listen(3000);
-		</code></pre>
+<pre><code>var tycho = require('tycho'),
+	server = tycho.createServer();
+	
+server.listen(3000);
+</code></pre>
 
 		<p>Create a new .html page and add the following to the header:</p>
 
-		<pre><code>
-		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-		<script type="text/javascript" src="/tycho-client.js"></script>
-		<script type="text/javascript" src="/message.js"></script>
-		</code></pre>
+<pre><code>&gt;script type="text/javascript" src="/socket.io/socket.io.js"&lt;&gt;/script&lt;
+&gt;script type="text/javascript" src="/tycho-client.js"&lt;&gt;/script&lt;
+&gt;script type="text/javascript" src="/message.js"&lt;&gt;/script&lt;
+</code></pre>
 
 		<p>Open a browser and navigate to http://localhost:3000.  Your page should load and connect to the tycho server.</p>
 
