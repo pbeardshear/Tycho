@@ -10,8 +10,8 @@ var tycho = require('tycho'),
 server.listen(3000);
 ```
 
-Tycho handles all of the real-time communication and architecture that are common across a majority of multiplayer games.  The purpose of Tycho is to allow prospective game developers
-to focus on writing the logic specific to their game, and let Tycho handle the underlying communication between server and client.
+Tycho handles all of the real-time communication and architecture that is common across the majority of multiplayer games.  The purpose is freeing developers to focus
+on writing their game, rather than worrying about managing all client-server interactions.
 
 ## Background
 
@@ -63,5 +63,5 @@ to provide consistency in message definitions.  All client-side code is purely o
 
 ## Documentation
 
-Full documentation can be found at: <coming soon>
+Full documentation can be found at: [coming soon]
 
