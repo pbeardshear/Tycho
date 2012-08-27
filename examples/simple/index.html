@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<head>
+	<title>Tycho Simple Message Example</title>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="tycho-client.js"></script>
+	<script type="text/javascript" src="message.js"></script>
+	<script type="text/javascript" src="client.js"></script>
+	<style>
+		h3 { font-family: Georgia, sans-serif; text-align: center; }
+		#container { width: 800px; margin: 50px auto; }
+		#message-receive { height: 300px; border: 1px solid #EEE; padding: 15px; margin-bottom: 15px; }
+		#message-receive .server-message { font-family: Trebuchet MS, sans-serif; font-size: 12px; }
+		#message-receive .message-source { color: #BE008A; }
+		#message-receive .message-source.client { color: #3F8FD2; }
+		#message-data { width: 400px;  height: 100px; font-family: Trebuchet MS, sans-serif; }
+		#submit { padding: 5px 10px; }
+	</style>
+</head>
+<body>
+	<div id="container">
+		<h3>Tycho Simple Messaging Example</h3>
+		<div id="message-receive"></div>
+		<div id="message-user">
+			<textarea id="message-data" placeholder="Type message to server"></textarea><br />
+			<button id="submit">Submit</button>
+		</div>
+	</div>
+</body>
+</html>
