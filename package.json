@@ -1,6 +1,6 @@
 {
   "author": "Peter Beardshear <pbeardshear@gmail.com> (http://prbr.me)",
-  "name": "Tycho",
+  "name": "tycho",
   "description": "A real-time multiplayer game framework for node.js",
   "version": "0.0.1",
   "homepage": "http://pbeardshear.github.com/Tycho/",
