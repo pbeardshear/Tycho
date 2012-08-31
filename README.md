@@ -1,7 +1,7 @@
 Tycho
 ==========
 
-###### Disclaimer: Tycho is under construction, any and all APIs are subject to change at any time without warning.
+###### Disclaimer: Tycho is under construction.  Any and all APIs are subject to change at any time without warning.
 
 A simple real-time multiplayer game framework for node.js.
 

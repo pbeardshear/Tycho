@@ -35,8 +35,8 @@ Message.Join = {
 
 
 // Send the join message to the server
-spine.send(Message.Join);
+tycho.send(Message.Join);
 // Send the host message to the server
-spine.send(Message.Host);
+tycho.send(Message.Host);
 
 
