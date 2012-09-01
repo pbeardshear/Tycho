@@ -72,7 +72,7 @@ Full documentation can be found at: http://pbeardshear.github.com/Tycho
 Back in 1994, a small Macintosh developer named Bungie released Marathon, the first in a trilogy of first-person shooter games.  The story of Marathon centers around
 a security officer (you), and a rampant Artificial Intelligence named Durandal bent on escaping the eventual end of the universe.  In doing so, he leads an enslaved alien
 race in a rebellion against their captors, who originally destroyed the ship you and Durandal were aboard and enslaved one
-of the other AIs that was aboard the ship.  The enslaved AIs name was Tycho.  Tycho doesn't figure into the story as prominently as Durandal, but whenever he does you know you
+of the other AIs that was aboard the ship.  The enslaved AI's name was Tycho.  Tycho doesn't figure into the story as prominently as Durandal, but whenever he does you know you
 are in for a treat.  His sarcastic and witty remarks are a fine counterpoint to Durandal's more straightforward approach, a testament to the excellent writing done
 throughout the games.  If you've never played a Marathon game before, you owe it to yourself to visit Aleph One (http://source.bungie.org/), a community continuation of
 the Marathon game engine following its release to the public in 1999.
