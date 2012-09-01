@@ -66,3 +66,13 @@ to provide consistency in message definitions.  All client-side code is purely o
 ## Documentation
 
 Full documentation can be found at: http://pbeardshear.github.com/Tycho
+
+### Tycho?
+
+Back in 1994, a small Macintosh developer named Bungie released Marathon, the first in a trilogy of first-person shooter games.  The story of Marathon centers around
+a security officer (you), and a rampant Artificial Intelligence (Durandal) bent on escaping the eventual end of the universe.  In doing so, he leads an enslaved alien
+race in a rebellion against their captors the Pfhor.  The Pfhor, who originally destroyed the ship you and Durandal were aboard (the U.E.S.C. Marathon), enslaved one
+of the other AI that was aboard the ship named, you guessed it, Tycho.  Tycho doesn't figure into the story as prominently as Durandal, but whenever he does you know you
+are in for a treat.  His sarcastic and witty remarks are a fine counterpoint to Durandal's more business-like approach, which serves to highlight the excellent writing
+throughout the games.  If you've never played a Marathon game before, you owe it to yourself to visit Aleph One (http://source.bungie.org/), a community continuation of
+the Marathon game engine following its release to the public.
