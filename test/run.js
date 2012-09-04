@@ -2,4 +2,4 @@
 //	Execute nodeunit test suite
 //
 reporter = require('nodeunit').reporters.default;
-reporter.run(['test']);
+reporter.run(['unit'], null, function () { console.log('end'); });
