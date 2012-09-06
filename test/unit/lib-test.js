@@ -36,6 +36,17 @@ module.exports = {
 		test.done();
 	},
 	
+	remove: function (test) {
+		var values = [1,2,3,4];
+		lib.remove(values, 1);
+		test.equal(values[1], 3);
+		// Removing outside array doesn't blow up
+		lib.remove(values, 5);
+		test.equal(values[2], 4);
+		test.equal(values.length, 3);
+		test.done();
+	},
+	
 	size: function (test) {
 		var o = {
 			prop1: 'nothin',
