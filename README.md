@@ -1,8 +1,6 @@
 Tycho
 ==========
 
-###### Disclaimer: Tycho is under construction.  Any and all APIs are subject to change at any time without warning.
-
 A simple real-time multiplayer game framework for node.js.
 
 ```js
@@ -28,11 +26,11 @@ Hooking your game logic into tycho is as simple as passing a few configuration p
 
 ```js
 tycho.createServer({
+	maxConnections: 100,
 	binding: {
 		connection: User,
 		instance: Game
-	},
-	maxConnections: 100
+	}
 });
 ```
 
@@ -48,7 +46,8 @@ interface.
 Tycho's messaging interface looks like the following:
 
 ```js
-var attack = tycho.messages.define({
+// Server
+tycho.messages.define({
 	move: {
 		init: function () { },
 		validate: function () { },
@@ -57,11 +56,19 @@ var attack = tycho.messages.define({
 	},
 	...
 });
+
+// Client
+tycho.messages.accept('move', function (data, callback) {
+	// Do stuff with the data
+	// ...
+	// Alert the server that you are done handling the message
+	callback();
+});
 ```
 
 Of these four parameters, only serialize is required.  init is called each time a new message of the defined type is created, and establishes some default state for the other methods.
-The validate method returns a boolean indicating whether the message should be sent down to the client, and serialize determines the actual data to send.  A callback can be provided if
-the server is requesting data from the client (e.g. updating server state), and would be executed when the client finishes handling the message.
+The validate method returns a boolean indicating whether the message should be sent, and serialize determines the actual data to send.  A callback can be provided and would be executed
+when the message is finished being received.
 
 ## Client
 
