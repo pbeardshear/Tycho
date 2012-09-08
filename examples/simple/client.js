@@ -17,7 +17,7 @@ $(function () {
 	// Handlers
 	$('#submit').on('click', function () {
 		printMessage('client', $(messageData).val());
-		tycho.Messages.send('another');
+		tycho.messages.send('another');
 	});
 	$(messageData).on('keydown', function (e) {
 		// Check if enter
@@ -27,9 +27,8 @@ $(function () {
 	});
 	
 	// Define messages that we can send up to the server
-	tycho.Messages.define({
+	tycho.messages.define({
 		sample: {
-			init: function () { },
 			serialize: function () { return 'this is a sample message'; }
 		},
 		another: {
@@ -45,7 +44,7 @@ $(function () {
 		}
 	});
 	// Bind a handler to a message from the server
-	tycho.Messages.accept('response', function (o) {
+	tycho.messages.accept('response', function (o) {
 		console.log(o);
 		printMessage('server', o);
 		clearInput();
@@ -54,5 +53,5 @@ $(function () {
 	tycho.connect();
 	
 	// Send off a sample message
-	tycho.Messages.send('sample');
+	tycho.messages.send('sample');
 });
