@@ -1,0 +1,9 @@
+blockquote { font-style: normal; }
+code { background-color: #191919; }
+.method { font-size: 14px; color: #DDD; font-family: "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif; margin: 10px 0; }
+.method code { font-size: 14px; margin: 0;}
+.config { }
+.config span { font-size: 14px; }
+.default { display: block; font-size: 12px !important; }
+.configName { font-weight: bold; font-size: 14px; }
+.configName .dataType { color: #FC0; font-weight: normal; font-size: 11px; margin-left: 5px; }

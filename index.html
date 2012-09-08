@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Tycho by pbeardshear</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
+		<link rel="stylesheet" href="stylesheets/main.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="javascripts/respond.js"></script>
@@ -53,8 +54,11 @@ server.listen(3000);
 		<p>Create a new .html page and add the following to the header:</p>
 
 <pre><code>&lt;script type="text/javascript" src="/socket.io/socket.io.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="/tycho-client.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="/message.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/tycho/tycho.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/tycho/message.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+	tycho.connect();
+&lt;/script&gt;
 </code></pre>
 
 		<p>Open a browser and navigate to <a href="http://localhost:3000">http://localhost:3000</a>.  Your page should load and connect to the tycho server.</p>
@@ -64,6 +68,112 @@ server.listen(3000);
 		<p>
 		Listed below is the full documenation for Tycho.
 		</p>
+		<hr>
+		
+		<p class="method"><code>tycho.createServer([config]) &nbsp;:&nbsp; tycho</code></p>
+		
+		<h5 class="configName">root <span class="dataType">[string]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>Sets the directory that the server will serve files from.</span>
+				<span class="default">Defaults to: The current directory</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">maxConnections <span class="dataType">[int]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>Sets the maximum number of concurrent connections allowed.</span>
+				<span class="default">Defaults to: 100</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">maxInstances <span class="dataType">[int]</span></h5>
+		<blockquote>
+			<p class="config">				
+				<span>Sets the maximum number of concurrent instances allowed.</span>
+				<span class="default">Defaults to: 10</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">namedInstances <span class="dataType">[bool]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>True to specify the names of instances when they are created.  If using namedInstances, autoCreateInstances must be set to false.</span>
+				<span class="default">Defaults to: false</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">autoCreateInstances <span class="dataType">[bool]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>True to have the server automatically create new instances.  See loadBalance to set the conditions for when a new instance should be created.</span>
+				<span class="default">Defaults to: true</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">autoAssignConnections <span class="dataType">[bool]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>True to have the server automatically assign a new connection to an instance.</span>
+				<span class="default">Defaults to: true</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">allowReconnect <span class="dataType">[bool]</span></h5>
+		<blockquote>
+		<p class="config">
+			<span>True to have users reconnect to their last instance if they disconnect.</span>
+			<span class="default">Defaults to: true</span>
+		</p>
+		</blockquote>
+		
+		<h5 class="configName">binding <span class="dataType">[object]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>Set the user-specific objects that should represent instances and connections in an application.  The object should be of the form</span>
+				<pre><code>{ connection: [Function], instance: [Function] }</code></pre>
+				<span class="default">Defaults to: {}</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">messages <span class="dataType">[object]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>The messaging system that tycho should use internally.  A user-defined messaging interface must define a send method with the following signature:</span>
+					<pre><code>function send(message, connection) { }</code></pre>
+					This method must call <code>connection.send(name, data, callback)</code> with the appropriate message name and data when finished.  Additionally, a receive method
+					can be defined which will be passed every message sent from the client.  The receive method should have the signature:
+					<pre><code>function receive(message, connection) { }</code></pre>
+				<span class="default">Defaults to: tycho.messages</span>
+			</p>
+		</blockquote>
+		
+		<h5 class="configName">routes <span class="dataType">[object]</span></h5>
+		<blockquote>
+			<p class="config">
+				<span>
+					Specify the messages and associated handlers that the server accepts from the client.  This can be done in two forms:
+<pre><code>// Basic route setup, all routes defined on connection
+{
+	route1: function (message, connection) { },
+	route2: function (message) { },
+	...
+}
+
+// Break routes down by destination
+{
+	connection: { ... },
+	instance: { ... },
+	server: { ... } 
+}</code></pre>
+					In the first case, each route will receive <code>(message, connection)</code>, with <code>this</code> being bound to the connection binding specified in the config.
+					In the second case, each route will receive <code>(message, target)</code>, where target is one of server, instance, or connection, depending on where the route was defined.
+					<code>this</code> will be bound to the binding specified in the config, or the server object, if the destination is the server.
+				</span>
+				<span class="default">Defaults to: {}</span>
+			</p>
+		</blockquote>
 		
 		<h3>Licensing</h3>
 		
