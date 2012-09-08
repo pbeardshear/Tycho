@@ -1,65 +1,58 @@
-window.addEventListener('load', function () {
-	var receive,
-		send,
-		messageData;
-			
+$(function () {
+	// Helper methods
 	function printMessage(source, message) {
-		var p = document.createElement('p');
-		p.setAttribute('class', 'server-message');
-		p.innerHTML = tycho.util.format('<span class="message-source {0}">[{0}]: </span>', source) + message;
-		receive.appendChild(p);
+		var content = ('<span class="message-source {0}">[{0}]: </span>'.replace(/{(0)}/g, source)) + message;
+		$(receive).append('<p class="server-message">' + content + '</p>');
 	}
 	
 	function clearInput() {
-		messageData && (messageData.value = '');
+		$(messageData).val('');
 	}
 	
-	tycho.init(3000);
-	receive = document.getElementById('message-receive');
-	send = document.getElementById('message-send');
-	messageData = document.getElementById('message-data');
+	// Dom references
+	var receive = $('#message-receive'),
+		send = $('#message-send'),
+		messageData = $('#message-data');
 	
-	// Set up message that we can send to server
-	tycho.Messages.create('sample', {
-		init: function () { },
-		serialize: function () { return 'this is a sample message'; }
-	});
-	
-	tycho.Messages.create('another', {
-		init: function () {
-			this.data = messageData.value;
-		},
-		validate: function () {
-			return this.data != '';
-		},
-		serialize: function () {
-			return ['Message title', this.data];
-		}
-	});
-	
-	// Set up namespace for accepted routes
-	var routes = {
-		response: function (o) {
-			printMessage('server', o.data);
-			clearInput();
-		}
-	};
-	tycho.Messages.acceptMessages(routes);
-	
-	// Bind event handler
-	document.getElementById('submit').addEventListener('click', function () {
-		printMessage('client', messageData.value);
+	// Handlers
+	$('#submit').on('click', function () {
+		printMessage('client', $(messageData).val());
 		tycho.Messages.send('another');
 	});
-	document.getElementById('message-data').addEventListener('keydown', function (e) {
+	$(messageData).on('keydown', function (e) {
 		// Check if enter
 		if (e.keyCode == 13) {
-			var event = document.createEvent('Event');
-			event.initEvent('click', true,  true);
-			document.getElementById('submit').dispatchEvent(event);
+			$('#submit').click();
 		}
 	});
 	
-	// Do a demo submit
+	// Define messages that we can send up to the server
+	tycho.Messages.define({
+		sample: {
+			init: function () { },
+			serialize: function () { return 'this is a sample message'; }
+		},
+		another: {
+			init: function () {
+				this.data = $(messageData).val();
+			},
+			validate: function () {
+				return this.data != '';
+			},
+			serialize: function () {
+				return ['Message title', this.data];
+			}
+		}
+	});
+	// Bind a handler to a message from the server
+	tycho.Messages.accept('response', function (o) {
+		console.log(o);
+		printMessage('server', o);
+		clearInput();
+	});
+	// Make a socket connection to the tycho server
+	tycho.connect();
+	
+	// Send off a sample message
 	tycho.Messages.send('sample');
 });

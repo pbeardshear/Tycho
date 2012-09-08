@@ -1,14 +1,13 @@
-var tycho = require('../../lib/tycho');
+var tycho = require('../../lib/tycho'),
+	server = tycho.createServer({
+		routes: {
+			sample: function (message) {
+				this.send('response', 'Beep boop, received sample message');
+			},
+			another: function (message) {
+				this.send('response', 'Echoing received message:\n' + message.data[1]);
+			}
+		}
+	});
 
-tycho.createServer().listen(3000);
-
-// tycho.Routes.sample = function (internal, message) {
-	// tycho.out.log('in routing');
-	// this.send('Beep boop, received sample message', 'response');
-// };
-
-// tycho.Routes.another = function (internal, message) {
-	////Echo back received message
-	// console.log(message);
-	// this.send('Echoing received message:\n' + message.data[1], 'response');
-// };
+server.listen(3000);
