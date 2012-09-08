@@ -28,9 +28,11 @@ Hooking your game logic into tycho is as simple as passing a few configuration p
 
 ```js
 tycho.createServer({
-	instanceType: Game,
-	connectionType: User,
-	maxConnection: 100
+	binding: {
+		connection: User,
+		instance: Game
+	},
+	maxConnections: 100
 });
 ```
 
@@ -46,11 +48,14 @@ interface.
 Tycho's messaging interface looks like the following:
 
 ```js
-var attack = tycho.Messages.create({
-	init: function () { },
-	validate: function () { },
-	serialize: function () { },
-	callback: function () { }
+var attack = tycho.messages.define({
+	move: {
+		init: function () { },
+		validate: function () { },
+		serialize: function () { },
+		callback: function () { }
+	},
+	...
 });
 ```
 
