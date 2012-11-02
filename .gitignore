@@ -3,3 +3,5 @@ page
 _*
 todo.*
 examples/catan
+*.sublime-*
+*-simple.js
