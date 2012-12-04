@@ -1,12 +1,14 @@
 Tycho
 ==========
 
+NOTE: As of (12/3/2012, v0.0.2), this README contains information that is out-of-date.  New documentation is forthcoming.
+
 A simple real-time multiplayer game framework for node.js.
 
 ```js
 var tycho = require('tycho'),
 	server = tycho.createServer();
-	
+
 server.listen(3000);
 ```
 
