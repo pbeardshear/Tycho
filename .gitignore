@@ -1,4 +1,6 @@
 node_modules
+.DS_Store
+docs
 page
 _*
 todo.*
@@ -6,3 +8,4 @@ examples/catan
 examples/lobby-game
 *.sublime-*
 *-simple.js
+*.txt
