@@ -13,11 +13,10 @@
     "node": ">=0.8"
   },
   "dependencies": {
-    "websocket": "1.0.8",
-    "send": "0.0.4",
+    "websocket": "1.0.x",
     "q": "0.9.4",
-    "redis": "0.8.3",
-    "hiredis": "0.1.15"
+    "redis": "0.8.x",
+    "hiredis": "0.1.x"
   },
   "devDependencies": {
     "mocha": "1.12.x"
