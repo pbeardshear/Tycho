@@ -15,14 +15,16 @@
   "dependencies": {
     "websocket": "1.0.x",
     "q": "0.9.4",
-    "redis": "0.8.x",
+    "redis": "0.8.x"
+  },
+  "optionalDependencies": {
     "hiredis": "0.1.x"
   },
   "devDependencies": {
     "mocha": "1.12.x"
   },
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha -R spec -c --recursive"
   },
   "main": "index"
 }
