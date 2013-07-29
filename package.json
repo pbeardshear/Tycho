@@ -2,7 +2,7 @@
   "author": "Peter Beardshear <pbeardshear@gmail.com> (http://prbr.me)",
   "name": "tycho",
   "description": "A real-time multiplayer game framework for node.js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "homepage": "http://pbeardshear.github.com/Tycho/",
   "keywords": ["tycho", "realtime", "multiplayer", "game"],
   "repository": {
