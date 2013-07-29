@@ -90,6 +90,44 @@ describe('Store', function () {
 				sender.send(eventType, receiver.processID, eventMessage);
 			});
 		});
+
+		it('should send messages with array payloads', function (done) {
+			var sender = new Store(2000, defaultPort),
+				receiver = new Store(3000, defaultPort),
+				eventType = 'arrayMsg',
+				eventMessage = ['some', 'data', 'in', 'this', 'array'];
+
+			receiver.on('message', function (type, message, src) {
+				assert.deepEqual(message, eventMessage);
+				assert.equal(src, sender.processID);
+				sender.close();
+				receiver.close();
+				done();
+			});
+
+			receiver.on('subscribe', function () {
+				sender.send(eventType, receiver.processID, eventMessage);
+			});
+		});
+
+		it('should send messages with object payloads', function (done) {
+			var sender = new Store(2000, defaultPort),
+				receiver = new Store(3000, defaultPort),
+				eventType = 'rise robot rise',
+				eventMessage = { devilsHands: 'idle playthings', route: 'all evil' };
+
+			receiver.on('message', function (type, message, src) {
+				assert.deepEqual(message, eventMessage);
+				assert.equal(src, sender.processID);
+				sender.close();
+				receiver.close();
+				done();
+			});
+
+			receiver.on('subscribe', function () {
+				sender.send(eventType, receiver.processID, eventMessage);
+			});
+		});
 	});
 
 	describe('#broadcast()', function () {
