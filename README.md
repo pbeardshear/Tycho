@@ -85,7 +85,7 @@ This method is only available in the worker process.
 
 Sets the room flag to the room given by ```name```.  This is used in conjunction with ```.get()``` and ```.set()``` to store custom data with a room.  Example:
 
-```
+```js
 tycho.room('lobby').set('name', 'Super Awesome Lobby');
 tycho.room('just another game name').set('maxPlayers', 10);
 ```
@@ -104,7 +104,7 @@ Emitted when a new connection request is set.  Listeners on this event must retu
 The following properties are only provided on WebSocket requests:
 
 * ```origin```: URL of the webpage from which the connection originated.  This property is ```null``` if the WebSocket connection did not originate from a browser.
-* ```resource```: the resource path requested by client.
+* ```resource```: the resource path requested by the client.
 * ```version```: version of WebSocket protocol requested by the client.
 
 #### connect (connection)
@@ -113,7 +113,7 @@ Emitted when a new connection is established with a client.  See Connection belo
 #### pause (serverType)
 Emitted when a server is paused.  ```serverType``` is a string which contains the type of the server being paused, and can be one of the following:
 
-```
+```js
 TCP - 'tcp:server'
 UDP - 'udp:server'
 WebSocket - 'ws:server'
@@ -121,6 +121,9 @@ WebSocket - 'ws:server'
 
 #### stop (serverType)
 Emitted when a server is stopped.  ```serverType``` is a string which contains the type of the server being stopped, and are the same as those used for ```pause```.
+
+#### httpRequest (request, response)
+Emitted when a WebSocket server receives an HTTP request.  Note that http requests are denied by default in WebSocket servers, ```enableHTTP``` needs to be explicitly set to ```true``` to receive this event.  The ```request``` and ```response``` objects are the same as those passed in the node ```http``` module ([here](http://nodejs.org/api/http.html))
 
 ## Connection
 
@@ -147,20 +150,20 @@ Pauses the connection, preventing messages from being sent or received.  This ca
 
 ### in (room)
 A flag which modifies ```send``` to broadcast to all connections in a room.  Example:
-```
+```js
 connection.in('lobby').send('hey everybody!');
 ```
 
 ### to (address)
 A flag which changes the client that a message is sent to.  This can be used effectively to send messages between clients.  Example:
-```
+```js
 connection1.to(connection2.address).send('show me the money!');
 // Message received at connection2
 ```
 
 ### get (key, callback)
 Retrieves connection properties added by ```set()```.  ```callback``` is a function which is passed the stored value.  Example:
-```
+```js
 // Earlier: connection.set('key', 'value');
 //
 // ...
@@ -171,7 +174,7 @@ connection.get('key', function (err, val) {
 
 ### set (key, value, callback)
 Sets an arbitrary property on this connection.  Developers should use this to store data associated with a client.  Example:
-```
+```js
 connection.set('key', 'value', function (err, result) {
 	// err is null if the set operation occurred successfully
 });
@@ -179,48 +182,34 @@ connection.set('key', 'value', function (err, result) {
 
 ## Servers
 
-Tycho currently supports three server types, which are passed to ```tycho.init``` in the initial configuration.
+Tycho currently supports three server types, which are passed to ```tycho.init``` in the initial configuration, as objects in the ```servers``` array.
+
+All server types support the following options:
+
+* ```port```: port number to start the server on.  Note that TCP and WebSocket servers must be started on different ports.
+* ```host```: host IP to start the server on.
 
 ### TCP
 Enabled by passing a config object with a type of ```tycho.constants.connectionTypes.TCP```.
 
-Options:
-
-```
-{
-	port: [int],
-	host: [string]
-}
-```
+* ```noDelay```: defaults to ```true```.  Disables the Nagle algorithm, which causes data to be sent immediately without buffering.
 
 ### UDP
 Enabled by passing a config object with a type of ```tycho.constants.connectionTypes.UDP```.
 
-Options:
-
-```
-{
-	port: [int],
-	host: [string]
-}
-```
+* ```type```: defaults to ```udp6```.  Valid values are ```udp4``` and ```udp6```.
 
 ### WebSocket
 Enabled by passing a config object with a type of ```tycho.constants.connectionTypes.WEBSOCKET```.
 
-Options:
-
-```
-{
-	port: [int]
-	host: [string]
-}
-```
+* ```secure```: defaults to ```null```.  Forces ```wss://``` connections to the server.  To enable, pass an object with ```cert``` and ```key``` properties, or with a ```pfx``` property.  See the documentation [here](http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener) for information on required properties.
+* ```noDelay```: defaults to ```true```.  Same as config option on TCP Server above.
+* ```enableHTTP```: defaults to ```false```.  Set to true to receive 'httpRequest' events.  See Events under Tycho above for more information.
 
 ## Control
 By default, Tycho starts a TCP server on port ```7331``` which accepts simple commands to manage or log Tycho behavior.  Unless indicated, all commands support an argument which specifies which server to send the command to.  Example:
 
-```
+```js
 // Using node net library
 var connection = net.connect(7331, function () {
 	connection.write('start tcp'); 	// start all tcp servers
@@ -234,8 +223,6 @@ var connection = net.connect(7331, function () {
 * ```resume```: starts a paused server.
 * ```heartbeat```: returns a serialized ```Object``` of the form: ```{ [workerID]: [running server list] }```.  ```[running server list]``` is a comma-separated string of server types running on the worker.
 * ```stats```: returns a serialized ```Object``` of the form: ```{ [workerID]: [usage statistics] }```.  ```[usage statistics]``` is a 3-element array of [processID, memory usage, connection count].
-
-##### NOTE: If both the TCP and WebSocket server types are enabled, they must be passed different port numbers to work!
 
 ## Documentation
 
