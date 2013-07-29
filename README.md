@@ -123,7 +123,7 @@ WebSocket - 'ws:server'
 Emitted when a server is stopped.  ```serverType``` is a string which contains the type of the server being stopped, and are the same as those used for ```pause```.
 
 #### httpRequest (request, response)
-Emitted when a WebSocket server receives an HTTP request.  Note that http requests are denied by default in WebSocket servers, ```enableHTTP``` needs to be explicitly set to ```true``` to receive this event.  The ```request``` and ```response``` objects are the same as those passed in the node ```http``` module ([here](http://nodejs.org/api/http.html))
+Emitted when a WebSocket server receives an HTTP request.  Note that http requests are denied by default in WebSocket servers, ```enableHTTP``` needs to be explicitly set to ```true``` to receive this event.  The ```request``` and ```response``` objects are the same as those passed in the node ```http``` module ([here](http://nodejs.org/api/http.html)).
 
 ## Connection
 
@@ -204,7 +204,7 @@ Enabled by passing a config object with a type of ```tycho.constants.connectionT
 
 * ```secure```: defaults to ```null```.  Forces ```wss://``` connections to the server.  To enable, pass an object with ```cert``` and ```key``` properties, or with a ```pfx``` property.  See the documentation [here](http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener) for information on required properties.
 * ```noDelay```: defaults to ```true```.  Same as config option on TCP Server above.
-* ```enableHTTP```: defaults to ```false```.  Set to true to receive 'httpRequest' events.  See Events under Tycho above for more information.
+* ```enableHTTP```: defaults to ```false```.  Set to true to receive ```httpRequest``` events.  See Events under Tycho above for more information.
 
 ## Control
 By default, Tycho starts a TCP server on port ```7331``` which accepts simple commands to manage or log Tycho behavior.  Unless indicated, all commands support an argument which specifies which server to send the command to.  Example:
